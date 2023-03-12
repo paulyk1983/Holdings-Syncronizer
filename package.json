@@ -4,7 +4,10 @@
   "description": "Main purpose is to fetch up-to-date portfolio holdings data and update any number of different apps (like Notion and Google Sheets) for viewing.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "start": "node dist/server.js",
+    "local": "npx tsc && node dist/server.js"
   },
   "repository": {
     "type": "git",

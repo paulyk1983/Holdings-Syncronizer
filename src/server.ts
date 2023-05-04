@@ -1,5 +1,6 @@
 import express, {Express, Request, Response} from 'express'
 import { getHoldingsController } from './controllers/notion'
+import * as dotenv from 'dotenv'
 
 const app: Express = express()
 const port = 3000
@@ -13,5 +14,6 @@ app.get('/notion/holdings', (req: Request, res: Response)=>{
 })
 
 app.listen(port, ()=> {
+dotenv.config()
 console.log(`[Server]: I am running at http://localhost:${port}`)
 })

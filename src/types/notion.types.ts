@@ -1,3 +1,5 @@
+import { RichTextItemResponse } from "@notionhq/client/build/src/api-endpoints"
+
 export interface NotionResponseBody {
     results:ResultsObject[]
 }
@@ -20,171 +22,158 @@ export interface NotionUpdateRequestBody {
 
 export interface ResultsObject {
     id: string
-    properties: any
+    properties: ImportedFidelityProperties
 }
 
-// "results": [
-//     {
-//         "object": "database",
-//         "id": "2934be7a-12a6-4e0c-8ebb-8d789cf79ace",
-//         "cover": null,
-//         "icon": null,
-//         "created_time": "2023-03-18T18:58:00.000Z",
-//         "created_by": {
-//             "object": "user",
-//             "id": "62a31505-bfc4-439d-949f-2687f3aa901a"
-//         },
-//         "last_edited_by": {
-//             "object": "user",
-//             "id": "62a31505-bfc4-439d-949f-2687f3aa901a"
-//         },
-//         "last_edited_time": "2023-03-25T17:33:00.000Z",
-//         "title": [
-//             {
-//                 "type": "text",
-//                 "text": {
-//                     "content": "Portfolio_Positions_Mar-08-2023",
-//                     "link": null
-//                 },
-//                 "annotations": {
-//                     "bold": false,
-//                     "italic": false,
-//                     "strikethrough": false,
-//                     "underline": false,
-//                     "code": false,
-//                     "color": "default"
-//                 },
-//                 "plain_text": "Portfolio_Positions_Mar-08-2023",
-//                 "href": null
-//             }
-//         ],
-//         "description": [],
-//         "is_inline": false,
-//         "properties": {
-//             "Account Name": {
-//                 "id": "%3BcxO",
-//                 "name": "Account Name",
-//                 "type": "select",
-//                 "select": {
-//                     "options": [
-//                         {
-//                             "id": "mezJ",
-//                             "name": "IRA - BDA",
-//                             "color": "red"
-//                         }
-//                     ]
-//                 }
-//             },
-//             "Percent Of Account": {
-//                 "id": "%3Dt%3D%5C",
-//                 "name": "Percent Of Account",
-//                 "type": "number",
-//                 "number": {
-//                     "format": "percent"
-//                 }
-//             },
-//             "Today's Gain/Loss Dollar": {
-//                 "id": "D%3A~g",
-//                 "name": "Today's Gain/Loss Dollar",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Total Gain/Loss Percent": {
-//                 "id": "Fj%60%7D",
-//                 "name": "Total Gain/Loss Percent",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Account Number": {
-//                 "id": "F%7D%7Dg",
-//                 "name": "Account Number",
-//                 "type": "number",
-//                 "number": {
-//                     "format": "number"
-//                 }
-//             },
-//             "Total Gain/Loss Dollar": {
-//                 "id": "Gnj%3D",
-//                 "name": "Total Gain/Loss Dollar",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Current Value": {
-//                 "id": "MvKz",
-//                 "name": "Current Value",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Last Price Change": {
-//                 "id": "Np%3E%3A",
-//                 "name": "Last Price Change",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Average Cost Basis": {
-//                 "id": "P%7D~D",
-//                 "name": "Average Cost Basis",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Quantity": {
-//                 "id": "U%5C%5Dm",
-//                 "name": "Quantity",
-//                 "type": "number",
-//                 "number": {
-//                     "format": "number"
-//                 }
-//             },
-//             "Description": {
-//                 "id": "%60OiX",
-//                 "name": "Description",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Today's Gain/Loss Percent": {
-//                 "id": "fSY%5C",
-//                 "name": "Today's Gain/Loss Percent",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Last Price": {
-//                 "id": "nQ%3B%3B",
-//                 "name": "Last Price",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Type": {
-//                 "id": "wZmm",
-//                 "name": "Type",
-//                 "type": "select",
-//                 "select": {
-//                     "options": [
-//                         {
-//                             "id": ";H><",
-//                             "name": "Cash",
-//                             "color": "yellow"
-//                         }
-//                     ]
-//                 }
-//             },
-//             "Cost Basis Total": {
-//                 "id": "xdam",
-//                 "name": "Cost Basis Total",
-//                 "type": "rich_text",
-//                 "rich_text": {}
-//             },
-//             "Symbol": {
-//                 "id": "title",
-//                 "name": "Symbol",
-//                 "type": "title",
-//                 "title": {}
-//             }
-//         },
-//         "parent": {
-//             "type": "page_id",
-//             "page_id": "c67f0e9e-0cb2-486d-acc9-d5c9406e863c"
-//         },
-//         "url": "https://www.notion.so/2934be7a12a64e0c8ebb8d789cf79ace",
-//         "archived": false
-//     }
-// ],
+export interface TitleOrRichText {
+    "type": string,
+    "text": {
+        "content": string,
+        "link"?: null | string
+    },
+    "annotations"?: {
+        "bold": boolean,
+        "italic": boolean,
+        "strikethrough": boolean,
+        "underline": boolean,
+        "code": boolean,
+        "color": string
+    },
+    "plain_text": string,
+    "href"?: null | string 
+}
+
+export interface ImportedFidelityProperties {
+    "Account Name": {
+        "id": string,
+        "type": "select",
+        "select": {
+            "id": string,
+            "name": "IRA - BDA",
+            "color": string
+        }
+    },
+    "Percent Of Account": {
+        "id": string,
+        "type": "number",
+        "number": number
+    },
+    "Today's Gain/Loss Dollar": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Total Gain/Loss Percent": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Account Number": {
+        "id": string,
+        "type": "number",
+        "number": number
+    },
+    "Total Gain/Loss Dollar": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Current Value": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Last Price Change": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Average Cost Basis": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Quantity": {
+        "id": string,
+        "type": "number",
+        "number": number
+    },
+    "Description": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Today's Gain/Loss Percent": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Last Price": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Type": {
+        "id": string,
+        "type": "select",
+        "select": {
+            "id": string,
+            "name": "Cash",
+            "color": string
+        }
+    },
+    "Cost Basis Total": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[]
+    },
+    "Symbol": TitleContainer
+}
+
+export interface TitleContainer {
+    "id": string,
+    "type": "title",
+    "title": Array<RichTextItemResponse>
+}
+
+export interface EnhancedFidelityPropertiesUpdate {
+    "Percent of Portfolio": {
+        "id": string,
+        "type": "number",
+        "number": number
+    },
+    "Description": {
+        "id": string,
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[] | {}
+    },
+    "Current Price": {
+        "id": string,
+        "type": "number",
+        "number": number
+    },
+    "Symbol": {
+        "id": string,
+        "type": "title",
+        "title": TitleOrRichText[] | {}
+    }
+}
+
+export interface EnhancedFidelityPropertiesCreate {
+    "Percent of Portfolio": {
+        "type": "number",
+        "number": number
+    },
+    "Description": {
+        "type": "rich_text",
+        "rich_text": TitleOrRichText[] | {}
+    },
+    "Current Price": {
+        "type": "number",
+        "number": number
+    },
+    "Symbol": {
+        "type": "title",
+        "title": TitleOrRichText[] | {}
+    }
+}

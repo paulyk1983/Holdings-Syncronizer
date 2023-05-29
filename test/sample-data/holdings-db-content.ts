@@ -88,9 +88,9 @@ export const holdingsDatabaseContent = {
                         "format": "dollar"
                     }
                 },
-                "Ticker": {
+                "Symbol": {
                     "id": "title",
-                    "name": "Ticker",
+                    "name": "Symbol",
                     "type": "title",
                     "title": {}
                 }

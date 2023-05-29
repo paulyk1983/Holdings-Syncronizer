@@ -7,11 +7,16 @@ import {
   UpdatePageParameters, 
   CreatePageParameters
 } from "@notionhq/client/build/src/api-endpoints"
-import { NotionQueryRequestBody } from '../types/notion.types'
+import { 
+  EnhancedFidelityPropertiesCreate,
+  EnhancedFidelityPropertiesUpdate,
+  ImportedFidelityProperties, 
+  NotionQueryRequestBody, 
+  TitleContainer, 
+  TitleOrRichText
+} from '../types/notion.types'
 
 /* TODOs:
-- create custom type for 'imported' and 'holding' Notion page properties
-- build mapper
 - implement and workout any bugs
 - environmentalize Ids
 - refactor
@@ -35,18 +40,18 @@ export const updateHoldingsDatabase = async ():Promise<void> => {
   const holdingsToAdd = getHoldingsToAdd(importDbResults, holdingsDbResults)
   const holdingsToRemove = getHoldingsToRemove(importDbResults, holdingsDbResults)
   const holdingsToUpdate = getHoldingsToUpdate(importDbResults, holdingsDbResults)
-  console.log('holdings arrays for execution build!')
+  console.log('holdings arrays for execution built!')
 
-  holdingsToUpdate.forEach(async(holding) => {    
-    await updateExistingHolding(holding.id, holding.properties)
-  });
-  holdingsToAdd.forEach(async(holding) => {
-    await addNewHolding(holdingsDatabaseId, holding.properties)
-  });
-  holdingsToRemove.forEach(async(holding) => {
+  for (const holding of holdingsToUpdate) {
+    await updateExistingHolding(holding.id, mapImportToHoldingsProperties(holding.properties, true))
+  }
+  for (const holding of holdingsToAdd) {
+    await addNewHolding(holdingsDatabaseId, mapImportToHoldingsProperties(holding.properties))
+  }
+  for (const holding of holdingsToRemove) {
     await removeHolding(holding.id)
-  });
-  
+  }
+
   console.log('holdings sync complete!')
 }
 
@@ -205,7 +210,26 @@ export const getHoldingsToAdd = (importedDatabaseContent:Array<PageObjectRespons
   return holdingsToAdd
 }
 
+export const listOfPagesToRemove = (importedDatabasePages:Array<PageObjectResponse>, enhancedDatabasePages:Array<PageObjectResponse>) => {
+  console.log('Building holdingsToRemove array...')
+
+  const enhancedPagesToRemove = enhancedDatabasePages.filter((enhancedPage) => {
+    const enhancedSymbolObj = enhancedPage.properties.Symbol as TitleContainer
+
+    return !enhancedSymbolObj 
+      || enhancedSymbolObj.title.length === 0 
+      || !importedDatabasePages.find((importedPage) => {
+        const importedSymbolObj = importedPage.properties.Symbol as TitleContainer
+        return getTitleValue(importedSymbolObj) === getTitleValue(enhancedSymbolObj)
+      }) 
+  })
+
+  console.log('holdingsToRemove array Built!')
+  return enhancedPagesToRemove
+}
 export const getHoldingsToRemove = (importedDatabaseContent:Array<PageObjectResponse>, holdingsDatabaseContent:Array<PageObjectResponse>) => {
+  console.log('Building holdingsToRemove array...')
+
   const holdingsToRemove:any[] = []
   
 
@@ -234,27 +258,84 @@ export const getHoldingsToRemove = (importedDatabaseContent:Array<PageObjectResp
     }
   });
 
+  console.log('holdingsToRemove array Built!')
   return holdingsToRemove
 }
 
+// TODO: this function is flawed. should not be comparing ids. also, use for of or map instead of forEach
 export const getHoldingsToUpdate = (importedDatabaseContent:Array<PageObjectResponse>, holdingsDatabaseContent:Array<PageObjectResponse>) => {
+  console.log('Building holdingsToUpdate array...')
   const holdingsToRemove = getHoldingsToRemove(importedDatabaseContent, holdingsDatabaseContent)
   let holdingsToUpdate:any[] = []
 
+  // Any row with non-matching Symbol property against the delete list is one to be updated
   importedDatabaseContent.forEach(rowFromImport => {
     holdingsToRemove.forEach(holdingToRemove => {
-      if (rowFromImport.id != holdingToRemove.id) {
+      if (rowFromImport.properties.Symbol != holdingToRemove.properties.Symbol) {
+        // Potential code smell here, but refactoring this means re-orienting these PageObjectRespose types
+        rowFromImport.id = holdingToRemove.id
         holdingsToUpdate.push(rowFromImport)
       }
     });
   });
 
+  console.log('holdingsToAdd array  Built!')
   return holdingsToUpdate
 }
 
 // Mapper
+export const mapImportToHoldingsProperties = (importPageProperties:ImportedFidelityProperties, includePageIds?:boolean):EnhancedFidelityPropertiesUpdate|EnhancedFidelityPropertiesCreate => {
 
-// export const mapImportToHoldingsProperties = (importPage) {
+  return {
+    "Symbol": buildTitleProperty(getTitleValue(importPageProperties.Symbol), includePageIds ? importPageProperties.Symbol.id: undefined), // These could be refatored using '||'
+    "Description": buildRichTextProperty(importPageProperties.Description.rich_text[0].plain_text, includePageIds ? importPageProperties.Description.id: undefined),
+    "Percent of Portfolio": buildNumberProperty(importPageProperties["Percent Of Account"].number, includePageIds ? importPageProperties["Percent Of Account"].id: undefined),
+    "Current Price": buildNumberProperty(importPageProperties['Last Price'].rich_text[0].plain_text, includePageIds ? importPageProperties["Last Price"].id: undefined)
+  } 
+}
 
-// }
+// Notion Object Helpers
+export const buildTitleProperty = (content:string, id?:string|undefined) => {
+  return {
+    "id": id,
+    "type": "title" as "title",
+    "title": [{
+      "text": {
+        "content": content
+      },
+      "plain_text": content
+    }]
+  }
+}
+export const buildRichTextProperty = (content:string, id?:string|undefined) => {
+  return {
+    "id": id,
+    "type": "rich_text" as "rich_text",
+    "rich_text": [{
+      "text": {
+        "content": content
+      },
+      "plain_text": content
+    }]
+  }
+}
+export const buildNumberProperty = (number:number|string, id?:string|undefined) => {
+  console.log(`Building number property with input: ${number}`)
+  
+  if (typeof number === 'string') {
+    number = Number(number.replace('$', ''))
+    if (Number.isNaN(number)) {
+      console.log(`Error: could not convert string, ${number} to a number.`)
+      number = 0
+    }
+  }
+  return {
+    "id": id,
+    "type": "number" as "number",
+    "number": number
+  }
+}
+export const getTitleValue = (titleObject:TitleContainer):string => {
+  return titleObject.title[0].plain_text
+}
 

@@ -44,96 +44,80 @@ export interface TitleOrRichText {
 }
 
 export interface ImportedFidelityProperties {
-    "Account Name": {
-        "id": string,
-        "type": "select",
-        "select": {
-            "id": string,
-            "name": "IRA - BDA",
-            "color": string
-        }
-    },
-    "Percent Of Account": {
-        "id": string,
-        "type": "number",
-        "number": number
-    },
-    "Today's Gain/Loss Dollar": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Total Gain/Loss Percent": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Account Number": {
-        "id": string,
-        "type": "number",
-        "number": number
-    },
-    "Total Gain/Loss Dollar": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Current Value": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Last Price Change": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Average Cost Basis": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Quantity": {
-        "id": string,
-        "type": "number",
-        "number": number
-    },
-    "Description": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Today's Gain/Loss Percent": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Last Price": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Type": {
-        "id": string,
-        "type": "select",
-        "select": {
-            "id": string,
-            "name": "Cash",
-            "color": string
-        }
-    },
-    "Cost Basis Total": {
-        "id": string,
-        "type": "rich_text",
-        "rich_text": TitleOrRichText[]
-    },
-    "Symbol": TitleContainer
+    "Account Name": SelectProperty,
+    "Percent Of Account": NumberProperty,
+    "Today's Gain/Loss Dollar": RichTextProperty,
+    "Total Gain/Loss Percent": RichTextProperty,
+    "Account Number": NumberProperty,
+    "Total Gain/Loss Dollar": RichTextProperty,
+    "Current Value": RichTextProperty,
+    "Last Price Change": RichTextProperty,
+    "Average Cost Basis": RichTextProperty,
+    "Quantity": NumberProperty,
+    "Description": RichTextProperty,
+    "Today's Gain/Loss Percent": RichTextProperty,
+    "Last Price": RichTextProperty,
+    "Type": SelectProperty,
+    "Cost Basis Total": RichTextProperty,
+    "Symbol": TitleProperty
 }
 
-export interface TitleContainer {
-    "id": string,
+export interface TitleProperty {
+    "id": string | undefined,
     "type": "title",
     "title": Array<RichTextItemResponse>
+}
+export interface NumberProperty {
+    "id": string | undefined,
+    "type": "number",
+    "number": number
+}
+export interface RichTextProperty {
+    "id": string | undefined,
+    "type": "rich_text",
+    "rich_text": Array<RichTextItemResponse>
+}
+
+export interface TitlePropertyWrite {
+    "id": string | undefined,
+    "type": "title",
+    "title": Array<RichTextItemRequest>
+}
+
+export interface RichTextPropertyWrite {
+    "id": string | undefined,
+    "type": "rich_text",
+    "rich_text": Array<RichTextItemRequest>
+}
+
+export interface SelectProperty {
+    "id": string | undefined,
+    "type": "select",
+    "select": {
+        "id": string,
+        "name": string,
+        "color": ColorOptions
+    }
+}
+
+// derived from Notion library v2.2.3
+export type ColorOptions = "default" | "gray" | "brown" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink" | "red";
+export interface RichTextItemRequest {
+    text: {
+        content: string;
+        link?: {
+            url: string;
+        } | null;
+    };
+    type?: "text";
+    annotations?: {
+        bold?: boolean;
+        italic?: boolean;
+        strikethrough?: boolean;
+        underline?: boolean;
+        code?: boolean;
+        color?: ColorOptions;
+    };
 }
 
 export interface EnhancedFidelityPropertiesUpdate {

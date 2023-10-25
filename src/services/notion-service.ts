@@ -12,8 +12,11 @@ import {
   EnhancedFidelityPropertiesUpdate,
   ImportedFidelityProperties, 
   NotionQueryRequestBody, 
-  TitleContainer, 
-  TitleOrRichText
+  TitleProperty, 
+  TitleOrRichText,
+  NumberProperty,
+  RichTextPropertyWrite,
+  TitlePropertyWrite
 } from '../types/notion.types'
 
 /* TODOs:
@@ -43,10 +46,16 @@ export const updateHoldingsDatabase = async ():Promise<void> => {
   console.log('holdings arrays for execution built!')
 
   for (const holding of holdingsToUpdate) {
-    await updateExistingHolding(holding.id, mapImportToHoldingsProperties(holding.properties, true))
+    await updateExistingHolding(
+      holding.id, 
+      transformFidelityPageProperties(holding.properties, true)
+    )
   }
   for (const holding of holdingsToAdd) {
-    await addNewHolding(holdingsDatabaseId, mapImportToHoldingsProperties(holding.properties))
+    await addNewHolding(
+      holdingsDatabaseId, 
+      transformFidelityPageProperties(holding.properties)
+    )
   }
   for (const holding of holdingsToRemove) {
     await removeHolding(holding.id)
@@ -214,12 +223,12 @@ export const listOfPagesToRemove = (importedDatabasePages:Array<PageObjectRespon
   console.log('Building holdingsToRemove array...')
 
   const enhancedPagesToRemove = enhancedDatabasePages.filter((enhancedPage) => {
-    const enhancedSymbolObj = enhancedPage.properties.Symbol as TitleContainer
+    const enhancedSymbolObj = enhancedPage.properties.Symbol as TitleProperty
 
     return !enhancedSymbolObj 
       || enhancedSymbolObj.title.length === 0 
       || !importedDatabasePages.find((importedPage) => {
-        const importedSymbolObj = importedPage.properties.Symbol as TitleContainer
+        const importedSymbolObj = importedPage.properties.Symbol as TitleProperty
         return getTitleValue(importedSymbolObj) === getTitleValue(enhancedSymbolObj)
       }) 
   })
@@ -283,9 +292,8 @@ export const getHoldingsToUpdate = (importedDatabaseContent:Array<PageObjectResp
   return holdingsToUpdate
 }
 
-// Mapper
-export const mapImportToHoldingsProperties = (importPageProperties:ImportedFidelityProperties, includePageIds?:boolean):EnhancedFidelityPropertiesUpdate|EnhancedFidelityPropertiesCreate => {
-
+// include pageIds for update request page. Do not for create page request
+export const transformFidelityPageProperties = (importPageProperties:ImportedFidelityProperties, includePageIds?:boolean):EnhancedFidelityPropertiesUpdate|EnhancedFidelityPropertiesCreate => {
   return {
     "Symbol": buildTitleProperty(getTitleValue(importPageProperties.Symbol), includePageIds ? importPageProperties.Symbol.id: undefined), // These could be refatored using '||'
     "Description": buildRichTextProperty(importPageProperties.Description.rich_text[0].plain_text, includePageIds ? importPageProperties.Description.id: undefined),
@@ -295,31 +303,29 @@ export const mapImportToHoldingsProperties = (importPageProperties:ImportedFidel
 }
 
 // Notion Object Helpers
-export const buildTitleProperty = (content:string, id?:string|undefined) => {
+export const buildTitleProperty = (content:string, id?:string|undefined):TitlePropertyWrite => {
   return {
     "id": id,
     "type": "title" as "title",
     "title": [{
       "text": {
         "content": content
-      },
-      "plain_text": content
+      }
     }]
   }
 }
-export const buildRichTextProperty = (content:string, id?:string|undefined) => {
+export const buildRichTextProperty = (content:string, id?:string|undefined):RichTextPropertyWrite => {
   return {
     "id": id,
     "type": "rich_text" as "rich_text",
     "rich_text": [{
       "text": {
         "content": content
-      },
-      "plain_text": content
+      }
     }]
   }
 }
-export const buildNumberProperty = (number:number|string, id?:string|undefined) => {
+export const buildNumberProperty = (number:number|string, id?:string|undefined):NumberProperty => {
   console.log(`Building number property with input: ${number}`)
   
   if (typeof number === 'string') {
@@ -329,13 +335,16 @@ export const buildNumberProperty = (number:number|string, id?:string|undefined) 
       number = 0
     }
   }
-  return {
+
+  const numberProperty:NumberProperty = {
     "id": id,
     "type": "number" as "number",
-    "number": number
+    "number": number,
   }
+
+  return numberProperty
 }
-export const getTitleValue = (titleObject:TitleContainer):string => {
+export const getTitleValue = (titleObject:TitleProperty):string => {
   return titleObject.title[0].plain_text
 }
 

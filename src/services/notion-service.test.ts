@@ -3,7 +3,7 @@ import { buildMockTitleProperty } from '../../test/utils';
 import { ImportedFidelityProperties, NumberProperty, RichTextProperty, RichTextPropertyWrite, TitlePropertyWrite } from '../types/notion.types';
 import { buildNumberProperty, buildRichTextProperty, buildTitleProperty, getTitleValue, transformFidelityPageProperties } from './notion-service';
 import {Chance} from 'chance'
-import { buildPageFromImportedFidelityDatabase } from '../../test/mocks/notion';
+// import { buildPageFromImportedFidelityDatabase } from '../../test/mocks/notion';
 
 const chance = new Chance();
 
@@ -101,16 +101,16 @@ describe('buildTitleProperty()', () => {
     });
 });
 
-describe.skip('transformFidelityPageProperties()', () => {
-    it('maps data for a create request', () => {
-        // build imported page
-        const importedFidelityPage:ImportedFidelityProperties = buildPageFromImportedFidelityDatabase()
-        const currentPriceValue:string = importedFidelityPage['Last Price'].rich_text[0].plain_text
-        const enhancedFidelityPage = transformFidelityPageProperties(importedFidelityPage)
+// describe.skip('transformFidelityPageProperties()', () => {
+//     it('maps data for a create request', () => {
+//         // build imported page
+//         const importedFidelityPage:ImportedFidelityProperties = buildPageFromImportedFidelityDatabase()
+//         const currentPriceValue:string = importedFidelityPage['Last Price'].rich_text[0].plain_text
+//         const enhancedFidelityPage = transformFidelityPageProperties(importedFidelityPage)
 
-        expect(enhancedFidelityPage['Current Price']).to.be.an("object").to.have.property("number").to.equal(2)
-    })
-})
+//         expect(enhancedFidelityPage['Current Price']).to.be.an("object").to.have.property("number").to.equal(2)
+//     })
+// })
 
 // Chai assertion examples:
 // expect(options.detectRetina).to.be.false

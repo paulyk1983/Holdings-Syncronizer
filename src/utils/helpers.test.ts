@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import { buildMockTitleProperty } from '../../test/utils';
 import { ImportedFidelityProperties, NumberProperty, RichTextProperty, RichTextPropertyWrite, TitlePropertyWrite } from '../types/notion.types';
-import { buildNumberProperty, buildRichTextProperty, buildTitleProperty, getTitleValue, transformFidelityPageProperties } from './notion-service';
+import { buildNumberProperty, buildRichTextProperty, buildTitleProperty, getTitleValue, transformFidelityPageProperties } from '../services/notion-service';
 import {Chance} from 'chance'
-import { buildPageFromImportedFidelityDatabase } from '../../test/mocks/notion';
+// import { buildPageFromImportedFidelityDatabase } from '../../test/mocks/notion';
 import { dollarStringToNumber } from './helpers';
 
 const chance = new Chance();

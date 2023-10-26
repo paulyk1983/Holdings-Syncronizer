@@ -3,70 +3,71 @@ import { ColorOptions, ImportedFidelityProperties } from '../../src/types/notion
 
 const chance = new Chance();
 
-export const buildPageFromImportedFidelityDatabase = ():ImportedFidelityProperties => {
-    const symbolString = chance.string({length:3, pool:'abcdefghijklmnop'})
-    const descriptionString = chance.sentence()
-    const lastPriceString = `$${chance.natural()}`
-    return {
-        Symbol: {
-            id: chance.string({pool:'abcd1234'}),
-            name: "Symbol",
-            type: "title" as "title",
-            title: [
-                {
-                    "type": "text" as "text",
-                    "text": {
-                        "content": symbolString,
-                        "link": null
-                    },
-                    "annotations": buildAnnotationsObject(),
-                    "plain_text": symbolString,
-                    "href": null
-                }
-            ]
-        },
-        Description: {
-            id: chance.string({pool:'abcd1234'}),
-            name: "Description",
-            type: "rich_text" as "rich_text",
-            rich_text: [
-                {
-                    "type": "text" as "text",
-                    "text": {
-                        "content": descriptionString,
-                        "link": null
-                    },
-                    "annotations": buildAnnotationsObject(),
-                    "plain_text": descriptionString,
-                    "href": null
-                }
-            ]
-        },
-        "Percent Of Account": {
-            "id": chance.string({pool:'abcd1234'}),
-            "type": "number" as "number",
-            "number": chance.natural()
-        },
-        "Last Price": {
-            "id": chance.string({pool:'abcd1234'}),
-            "type": "rich_text" as "rich_text",
-            "rich_text": [
-                {
-                    "type": "text" as "text",
-                    "text": {
-                        "content": lastPriceString,
-                        "link": null
-                    },
-                    "annotations": buildAnnotationsObject(),
-                    "plain_text": lastPriceString,
-                    "href": null
-                }
-            ]
-        },
-        ...staticFidelityObject
-    }
+// TODO: figure out type error
+// export const buildPageFromImportedFidelityDatabase = ():ImportedFidelityProperties => {
+//     const symbolString = chance.string({length:3, pool:'abcdefghijklmnop'})
+//     const descriptionString = chance.sentence()
+//     const lastPriceString = `$${chance.natural()}`
+//     return {
+//         Symbol: {
+//             id: chance.string({pool:'abcd1234'}),
+//             name: "Symbol",
+//             type: "title" as "title",
+//             title: [
+//                 {
+//                     "type": "text" as "text",
+//                     "text": {
+//                         "content": symbolString,
+//                         "link": null
+//                     },
+//                     "annotations": buildAnnotationsObject(),
+//                     "plain_text": symbolString,
+//                     "href": null
+//                 }
+//             ]
+//         },
+//         Description: {
+//             id: chance.string({pool:'abcd1234'}),
+//             name: "Description",
+//             type: "rich_text" as "rich_text",
+//             rich_text: [
+//                 {
+//                     "type": "text" as "text",
+//                     "text": {
+//                         "content": descriptionString,
+//                         "link": null
+//                     },
+//                     "annotations": buildAnnotationsObject(),
+//                     "plain_text": descriptionString,
+//                     "href": null
+//                 }
+//             ]
+//         },
+//         "Percent Of Account": {
+//             "id": chance.string({pool:'abcd1234'}),
+//             "type": "number" as "number",
+//             "number": chance.natural()
+//         },
+//         "Last Price": {
+//             "id": chance.string({pool:'abcd1234'}),
+//             "type": "rich_text" as "rich_text",
+//             "rich_text": [
+//                 {
+//                     "type": "text" as "text",
+//                     "text": {
+//                         "content": lastPriceString,
+//                         "link": null
+//                     },
+//                     "annotations": buildAnnotationsObject(),
+//                     "plain_text": lastPriceString,
+//                     "href": null
+//                 }
+//             ]
+//         },
+//         ...staticFidelityObject
+//     }
     
-}
+// }
 
 const staticFidelityObject = {
     "Account Name": {
